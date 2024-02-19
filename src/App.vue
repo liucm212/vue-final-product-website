@@ -1,30 +1,19 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div class="container mx-auto">
+    <div class="p-20 flex gap-x-10 justify-center">
+      <p class="text-primary text-3xl font-bold">Color Primary</p>
+      <p class="text-secondary text-3xl font-bold">Color Secondary</p>
+      <p class="text-third text-3xl font-bold">Color Third</p>
+    </div>
+    <nav class="text-center">
+      <router-link to="/" class="text-third">Home</router-link> |
+      <router-link to="/about" class="text-third">About</router-link> |
+      <router-link to="/login" class="text-third">Login</router-link>
+    </nav>
+    <router-view/>
+  </div>
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
 </style>

@@ -68,14 +68,26 @@ export default {
       const loginAPI = `${process.env.VUE_APP_API}admin/signin`
       console.log(loginAPI)
       this.$http.post(loginAPI, this.user).then((res) => {
-        console.log(res)
-        // get token and expired from res.data
-        const { token, expired, message } = res.data
-        this.msg = message
-        // set cookie
-        console.log(token)
-        console.log(expired)
-        document.cookie = `hexToken=${token}; expires=${new Date(expired)}`
+        // console.log(res)
+        // if login successfully, push cookie into header and redirect to /dashboard,
+        if (res.data.success) {
+          // get token and expired from res.data
+          const { token, expired, message } = res.data
+          this.msg = message
+          // set cookie
+          // console.log(token)
+          // console.log(expired)
+          document.cookie = `hexToken=${token}; expires=${new Date(expired)}`
+          // Important: If axios is used with multiple domains, the AUTH_TOKEN
+          // will be sent to all of them.
+          // See below for an example using Custom instance defaults instead.
+          // 將token寫進headers
+          this.$http.defaults.headers.common.Authorization = token
+          this.$http.defaults.headers.post['Content-Type'] =
+          'application/x-www-form-urlencoded'
+          // redirect to /dashboard
+          this.$router.push('/dashboard/products')
+        }
       })
     }
   }

@@ -19,7 +19,20 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('../views/DashboardView.vue'),
+    children: [
+      {
+        path: 'products',
+        name: 'products',
+        component: () => import('../views/ProductsView.vue')
+      }
+    ]
   }
+
 ]
 
 const router = createRouter({

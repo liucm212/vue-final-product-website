@@ -1,8 +1,13 @@
 <template>
+  <NavbarComponent></NavbarComponent>
   <router-view/>
 </template>
 <script>
+import NavbarComponent from '@/components/NavbarComponent.vue'
 export default {
+  components: {
+    NavbarComponent
+  },
   data () {
     return {}
   },
@@ -24,6 +29,7 @@ export default {
     this.$http.post(api).then((res) => {
       // if not login, redirect to /login path
       if (!res.data.success) {
+        alert('未登入系統，請先登入！')
         this.$router.push('/login')
       }
     })

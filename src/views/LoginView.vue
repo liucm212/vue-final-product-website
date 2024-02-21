@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
+  <div class="min-h-screen flex flex-col justify-center sm:py-12">
     <div class="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
       <h1 class="font-bold text-center text-2xl mb-5">狀態：<span class="text-third">{{ msg }}</span></h1>
       <div class="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
@@ -86,7 +86,7 @@ export default {
           this.$http.defaults.headers.post['Content-Type'] =
           'application/x-www-form-urlencoded'
           // redirect to /dashboard
-          this.$router.push('/dashboard/products')
+          this.$router.push('/')
         }
       })
     }

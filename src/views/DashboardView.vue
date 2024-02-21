@@ -1,6 +1,10 @@
 <template>
   <NavbarComponent></NavbarComponent>
-  <router-view/>
+  <div class="container mx-auto">
+    <div class="py-10">
+      <router-view/>
+    </div>
+  </div>
 </template>
 <script>
 import NavbarComponent from '@/components/NavbarComponent.vue'

@@ -1,7 +1,5 @@
 <template>
-  <div class="container-xl mx-auto">
-    <router-view/>
-  </div>
+  <router-view/>
 </template>
 
 <script>

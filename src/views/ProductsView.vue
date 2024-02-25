@@ -1,4 +1,6 @@
 <template>
+  <ProductModal :product="tempProduct" @update-product="updateProduct"
+  @modal-cancel="clearProduct"></ProductModal>
   <div class="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
       <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
         <div class="overflow-hidden">
@@ -44,7 +46,10 @@
                       編輯
                     </button>
                     <button
-                      class="middle none center rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                      class="middle none center rounded-lg bg-red-500 py-3 px-6 font-sans text-xs font-bold uppercase
+                      text-white shadow-md shadow-red-500/20 transition-all hover:shadow-lg hover:shadow-red-500/40
+                      focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none
+                      disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       data-ripple-light="true"
                     >
                       刪除
@@ -60,12 +65,17 @@
 </template>
 
 <script>
+import ProductModal from '@/components/ProductModal.vue'
 export default {
   data () {
     return {
+      tempProduct: {},
       products: [],
       pagination: {}
     }
+  },
+  components: {
+    ProductModal
   },
   methods: {
     getProducts () {
@@ -77,6 +87,27 @@ export default {
         if (res.data.success) {
           this.products = res.data.products
           this.pagination = res.data.pagination
+        }
+      })
+    },
+    clearProduct () {
+      this.tempProduct = {}
+    },
+    // get data and post them by using API
+    updateProduct (tempProduct) {
+      this.tempProduct = tempProduct
+      // post data by API
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product`
+      console.log(api)
+      this.$http.post(api, { data: this.tempProduct }).then((res) => {
+        // console.log(res)
+        // if 有接收到資料，就將資料中的products, pagination傳進component
+        if (res.data.success) {
+          console.log(res.data)
+          this.getProducts()
+          this.clearProduct()
+        } else {
+          console.log(res)
         }
       })
     }

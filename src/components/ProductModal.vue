@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-end">
-        <button @click="toggleModal" class="none center rounded-lg bg-green-600 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-green-500/20 transition-all hover:shadow-lg hover:shadow-greem-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">Toggle Modal</button>
+        <button @click="openModal(true, true)" class="none center rounded-lg bg-green-600 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-green-500/20 transition-all hover:shadow-lg hover:shadow-greem-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">新增品項</button>
     </div>
     <!-- Modal -->
     <div v-if="isOpen" class="fixed z-10 inset-0 overflow-y-auto">
@@ -49,8 +49,8 @@
                     <div class="flex flex-col">
                       <label for="isEnabled" class="text-2xl font-bold">是否啟用</label>
                       <select id="isEnabled" class="h-8 px-2 border border-black rounded" v-model.number="tempProduct.is_enabled">
-                        <option selected value="true">是</option>
-                        <option value="false">否</option>
+                        <option value="1">是</option>
+                        <option value="0">否</option>
                       </select>
                     </div>
                     <div class="col-span-2">
@@ -67,10 +67,10 @@
                 <!-- modal-button -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button @click.prevent="addItem(tempProduct)"  type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Add Item
+                    完成
                     </button>
                     <button @click="modalCancel" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Cancel
+                    取消
                     </button>
                 </div>
             </div>
@@ -81,6 +81,10 @@
 <script>
 export default {
   props: {
+    isOpen: {
+      type: Boolean,
+      default () { return false }
+    },
     product: {
       type: Object,
       default () { return {} }
@@ -88,29 +92,36 @@ export default {
   },
   data () {
     return {
-      isOpen: false,
       tempProduct: {}
     }
   },
   methods: {
-    toggleModal () {
-      this.isOpen = !this.isOpen
+    /*
+    因為props的機制是外傳內（不能在裡面改動外面），所以內部在取得資料一定是跟外部取完再assign到內部（新增、編輯功能都是），因此才需要在內外都建立一個空物件。
+    => 外部的tempProduct雖然一開始是空物件，但如果按下編輯按鈕，就會將api的data裝到tempProduct中，進一步再裝到ProductModal.vue的product中，達成單向綁定的作用。
+    */
+    openModal (isOpen, isNew) {
+      this.$emit('open-modal', isOpen, isNew)
     },
     modalCancel () {
       this.$emit('modal-cancel')
-      this.toggleModal()
+      this.openModal(false)
     },
     // emit addItem when the add item is clicked
     addItem (tempProduct) {
       console.log('ADD ITEM!')
       this.$emit('update-product', tempProduct)
-      this.toggleModal()
+      this.openModal()
     }
   },
   computed: {
     // transfer string into boolean
     isEnabledCheck () {
-      return this.tempProduct.is_enabled === 'false' ? false : Boolean(this.tempProduct.is_enabled)
+      if (this.tempProduct.is_enabled === '1') {
+        return true
+      } else {
+        return false
+      }
     }
   },
   watch: {
@@ -123,6 +134,6 @@ export default {
       this.tempProduct.is_enabled = newBoolean
     }
   },
-  emits: ['update-product', 'modal-cancel']
+  emits: ['open-modal', 'update-product', 'modal-cancel']
 }
 </script>

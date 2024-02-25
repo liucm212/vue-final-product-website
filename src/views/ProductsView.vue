@@ -1,6 +1,7 @@
 <template>
-  <ProductModal :product="tempProduct" @update-product="updateProduct"
-  @modal-cancel="clearProduct"></ProductModal>
+  <ProductModal :product="tempProduct" :isOpen="isOpen" @update-product="updateProduct"
+  @modal-cancel="clearProduct"
+  @open-modal="openModal"></ProductModal>
   <div class="overflow-x-auto sm:mx-0.5 lg:mx-0.5">
       <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
         <div class="overflow-hidden">
@@ -42,6 +43,7 @@
                     <button
                       class="middle none center rounded-lg bg-green-500 py-3 px-6 font-sans text-xs font-bold uppercase text-white shadow-md shadow-green-500/20 transition-all hover:shadow-lg hover:shadow-green-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       data-ripple-light="true"
+                      @click="openModal(true, false, item)"
                     >
                       編輯
                     </button>
@@ -51,6 +53,7 @@
                       focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none
                       disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                       data-ripple-light="true"
+                      @click="deleteProduct(item.id)"
                     >
                       刪除
                     </button>
@@ -69,6 +72,10 @@ import ProductModal from '@/components/ProductModal.vue'
 export default {
   data () {
     return {
+      // is new data or just edit
+      isNew: true,
+      // modal open state
+      isOpen: false,
       tempProduct: {},
       products: [],
       pagination: {}
@@ -78,6 +85,7 @@ export default {
     ProductModal
   },
   methods: {
+    // 取得products data
     getProducts () {
       const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/products`
       console.log(api)
@@ -90,16 +98,38 @@ export default {
         }
       })
     },
+    // 清除tempProduct content 並關掉modal
     clearProduct () {
       this.tempProduct = {}
+      this.isOpen = false
     },
-    // get data and post them by using API
+    // 打開modal並判斷是新增還是編輯
+    openModal (isOpen, isNew, item) {
+      this.isOpen = isOpen
+      this.isNew = isNew
+      this.checkProduct(item)
+    },
+    checkProduct (item) {
+      if (this.isNew) {
+        this.tempProduct = {}
+      } else {
+        this.tempProduct = { ...item }
+      }
+      console.log(this.tempProduct)
+    },
+    // 更新product list (新增＆編輯)
     updateProduct (tempProduct) {
       this.tempProduct = tempProduct
-      // post data by API
-      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product`
-      console.log(api)
-      this.$http.post(api, { data: this.tempProduct }).then((res) => {
+
+      let api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product`
+      let method = 'post'
+
+      if (!this.isNew) {
+        // edit item
+        api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${tempProduct.id}`
+        method = 'put'
+      }
+      this.$http[method](api, { data: this.tempProduct }).then((res) => {
         // console.log(res)
         // if 有接收到資料，就將資料中的products, pagination傳進component
         if (res.data.success) {
@@ -108,6 +138,17 @@ export default {
           this.clearProduct()
         } else {
           console.log(res)
+        }
+      })
+    },
+    // 刪除特定一個product
+    deleteProduct (id) {
+      const api = `${process.env.VUE_APP_API}api/${process.env.VUE_APP_PATH}/admin/product/${id}`
+      this.$http.delete(api).then((res) => {
+        if (res.data.success) {
+          console.log(res.data.success)
+          this.getProducts()
+          this.clearProduct()
         }
       })
     }
